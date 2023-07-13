@@ -1595,6 +1595,18 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
     }
 
+    // Hard code to enable Multi NVENC Split Frame Encoding in HEVC and AV1
+    // Split frame encoding is always disabled when any of the following features is in use.
+    // https://docs.nvidia.com/video-technologies/video-codec-sdk/12.1/nvenc-video-encoder-api-prog-guide/index.html
+    if( ctx->init_encode_params.enableWeightedPrediction == 0 &&
+        ctx->init_encode_params.encodeConfig->encodeCodecConfig.hevcConfig.enableAlphaLayerEncoding == 0 &&
+        ctx->init_encode_params.enableSubFrameWrite == 0 &&
+        ctx->init_encode_params.enableOutputInVidmem == 0)
+    {
+        ctx->init_encode_params.splitEncodeMode = NV_ENC_SPLIT_THREE_FORCED_MODE;
+        // printf("Forced 3-strip split frame encoding!\n");
+    }
+
     if (avctx->gop_size > 0) {
         // only overwrite preset if a GOP size was selected as input
         ctx->encode_config.gopLength = avctx->gop_size;
