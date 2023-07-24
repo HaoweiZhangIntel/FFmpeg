@@ -1014,6 +1014,17 @@ static av_cold void nvenc_setup_rate_control(AVCodecContext *avctx)
             ctx->rc = NV_ENC_PARAMS_RC_VBR;
         }
     }
+    // Haowei, manully set the CONSTQP mode to control the bitrate
+    if(ctx->init_encode_params.splitEncodeMode == NV_ENC_SPLIT_THREE_FORCED_MODE)
+    {
+        ctx->rc = NV_ENC_PARAMS_RC_CONSTQP;
+        ctx->encode_config.rcParams.constQP.qpIntra = 30;
+        ctx->encode_config.rcParams.constQP.qpInterP = 30;
+        ctx->encode_config.rcParams.constQP.qpInterB = 30;
+        // ctx->cbr = 1;
+        // ctx->rc = NV_ENC_PARAMS_RC_CBR;
+    }
+    // printf("NV_ENC_PARAMS_RC_MODE = %d\n", ctx->rc);
 #else
     if (ctx->rc < 0) {
         if (ctx->flags & NVENC_ONE_PASS)
